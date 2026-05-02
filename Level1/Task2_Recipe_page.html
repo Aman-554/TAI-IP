@@ -1,0 +1,756 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Savory Stories - Recipe Collection</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=DM+Sans:wght@400;500;600&display=swap"
+        rel="stylesheet">
+    <style>
+        :root {
+            --primary: #d4623f;
+            --primary-dark: #b94d2a;
+            --accent: #f4a460;
+            --bg-cream: #faf7f2;
+            --bg-white: #ffffff;
+            --text-dark: #2c2416;
+            --text-medium: #5a4a3a;
+            --text-light: #8c7a68;
+            --border: #e8dfd1;
+            --shadow: rgba(44, 36, 22, 0.08);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'DM Sans', sans-serif;
+            background: var(--bg-cream);
+            color: var(--text-dark);
+            line-height: 1.7;
+        }
+
+        /* Header & Navigation */
+        header {
+            background: var(--bg-white);
+            border-bottom: 1px solid var(--border);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 2px 20px var(--shadow);
+        }
+
+        .header-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 1.5rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .brand {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--primary);
+            letter-spacing: -0.02em;
+        }
+
+        nav ul {
+            display: flex;
+            gap: 2.5rem;
+            list-style: none;
+        }
+
+        nav a {
+            text-decoration: none;
+            color: var(--text-dark);
+            font-weight: 500;
+            font-size: 0.95rem;
+            transition: color 0.3s ease;
+            position: relative;
+        }
+
+        nav a::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: var(--primary);
+            transition: width 0.3s ease;
+        }
+
+        nav a:hover {
+            color: var(--primary);
+        }
+
+        nav a:hover::after {
+            width: 100%;
+        }
+
+        /* Hero Section */
+        .hero {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
+            padding: 4rem 2rem;
+            text-align: center;
+            color: white;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg width="60" height="60" xmlns="http://www.w3.org/2000/svg"><circle cx="2" cy="2" r="1" fill="rgba(255,255,255,0.1)"/></svg>');
+            opacity: 0.4;
+        }
+
+        .hero-content {
+            position: relative;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .hero h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: 3.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            letter-spacing: -0.02em;
+        }
+
+        .hero p {
+            font-size: 1.2rem;
+            opacity: 0.95;
+        }
+
+        /* Main Content */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 3rem 2rem;
+        }
+
+        /* Recipe Grid */
+        .recipe-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 3rem;
+            margin-bottom: 4rem;
+        }
+
+        /* Recipe Card */
+        .recipe-card {
+            background: var(--bg-white);
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 4px 20px var(--shadow);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            animation: fadeInUp 0.6s ease forwards;
+            opacity: 0;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .recipe-card:nth-child(1) {
+            animation-delay: 0.1s;
+        }
+
+        .recipe-card:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+
+        .recipe-card:nth-child(3) {
+            animation-delay: 0.3s;
+        }
+
+        .recipe-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 8px 30px var(--shadow);
+        }
+
+        .recipe-image {
+            width: 100%;
+            height: 280px;
+            object-fit: cover;
+            border-bottom: 3px solid var(--primary);
+        }
+
+        .recipe-content {
+            padding: 2rem;
+        }
+
+        .recipe-header {
+            margin-bottom: 1.5rem;
+        }
+
+        .recipe-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--text-dark);
+            margin-bottom: 0.5rem;
+            letter-spacing: -0.01em;
+        }
+
+        .recipe-tagline {
+            color: var(--text-medium);
+            font-size: 0.95rem;
+            font-style: italic;
+        }
+
+        .recipe-intro {
+            color: var(--text-medium);
+            margin-bottom: 1.5rem;
+            line-height: 1.7;
+        }
+
+        /* Quick Info Bar */
+        .quick-info {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+            margin-bottom: 2rem;
+            padding: 1.5rem;
+            background: var(--bg-cream);
+            border-radius: 12px;
+        }
+
+        .info-item {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .info-label {
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--text-light);
+            font-weight: 600;
+            margin-bottom: 0.3rem;
+        }
+
+        .info-value {
+            font-size: 1.1rem;
+            color: var(--text-dark);
+            font-weight: 600;
+        }
+
+        .difficulty {
+            display: inline-block;
+            padding: 0.3rem 0.8rem;
+            background: var(--primary);
+            color: white;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        /* Section Headers */
+        .section-header {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 1.2rem;
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+        }
+
+        .section-header::before {
+            content: '';
+            width: 40px;
+            height: 3px;
+            background: var(--primary);
+        }
+
+        /* Ingredients */
+        .ingredients-section {
+            margin-bottom: 2rem;
+        }
+
+        .ingredient-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .ingredient-group-title {
+            font-weight: 600;
+            color: var(--text-dark);
+            margin-bottom: 0.8rem;
+            font-size: 1.05rem;
+        }
+
+        .ingredients-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .ingredients-list li {
+            padding: 0.7rem 0 0.7rem 2rem;
+            border-bottom: 1px solid var(--border);
+            position: relative;
+            color: var(--text-medium);
+        }
+
+        .ingredients-list li::before {
+            content: '•';
+            position: absolute;
+            left: 0.5rem;
+            color: var(--primary);
+            font-size: 1.5rem;
+            line-height: 1;
+        }
+
+        .ingredients-list li:last-child {
+            border-bottom: none;
+        }
+
+        /* Instructions */
+        .instructions-section {
+            margin-bottom: 2rem;
+        }
+
+        .instructions-list {
+            counter-reset: step-counter;
+            list-style: none;
+            padding: 0;
+        }
+
+        .instructions-list li {
+            counter-increment: step-counter;
+            padding: 1.5rem 0 1.5rem 4rem;
+            border-bottom: 1px solid var(--border);
+            position: relative;
+            color: var(--text-medium);
+        }
+
+        .instructions-list li::before {
+            content: counter(step-counter);
+            position: absolute;
+            left: 0;
+            top: 1.2rem;
+            width: 2.5rem;
+            height: 2.5rem;
+            background: var(--primary);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 1.1rem;
+        }
+
+        .instructions-list li:last-child {
+            border-bottom: none;
+        }
+
+        /* Tips Section */
+        .tips-section {
+            background: linear-gradient(135deg, #fff8f0 0%, #fff 100%);
+            padding: 1.5rem;
+            border-radius: 12px;
+            border-left: 4px solid var(--accent);
+            margin-bottom: 2rem;
+        }
+
+        .tips-title {
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 1rem;
+            font-size: 1.1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .tips-title::before {
+            content: '💡';
+            font-size: 1.3rem;
+        }
+
+        .tips-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .tips-list li {
+            padding: 0.5rem 0;
+            color: var(--text-medium);
+            padding-left: 1.5rem;
+            position: relative;
+        }
+
+        .tips-list li::before {
+            content: '→';
+            position: absolute;
+            left: 0;
+            color: var(--accent);
+            font-weight: 700;
+        }
+
+        /* Footer */
+        footer {
+            background: var(--text-dark);
+            color: var(--bg-cream);
+            text-align: center;
+            padding: 3rem 2rem;
+            margin-top: 4rem;
+        }
+
+        footer p {
+            opacity: 0.8;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 2.5rem;
+            }
+
+            .recipe-grid {
+                grid-template-columns: 1fr;
+            }
+
+            nav ul {
+                gap: 1.5rem;
+            }
+
+            .quick-info {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Header -->
+    <header>
+        <div class="header-container">
+            <div class="brand">Savory Stories</div>
+            <nav>
+                <ul>
+                    <li><a href="#recipes">Recipes</a></li>
+                    <li><a href="#about">About</a></li>
+                    <li><a href="#collections">Collections</a></li>
+                    <li><a href="#footer-container">Contact</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="hero-content">
+            <h1>Delicious Recipes, Crafted with Love</h1>
+            <p>Explore our collection of tried-and-true recipes that bring joy to every meal</p>
+        </div>
+    </section>
+
+    <!-- Main Content -->
+    <div class="container">
+        <div class="recipe-grid">
+
+            <!-- Recipe 1: Creamy Mushroom Risotto -->
+            <article class="recipe-card">
+                <img src="https://images.unsplash.com/photo-1637361874063-e5e415d7bcf7?q=80&w=687&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+                    alt="Creamy Mushroom Risotto" class="recipe-image">
+                <div class="recipe-content">
+                    <div class="recipe-header">
+                        <h2 class="recipe-title">Creamy Mushroom Risotto</h2>
+                        <p class="recipe-tagline">Luxurious comfort in every bite</p>
+                    </div>
+
+                    <p class="recipe-intro">
+                        This velvety mushroom risotto is the ultimate comfort food. Rich, creamy, and packed with earthy
+                        mushroom flavors, it's perfect for a cozy dinner at home or impressing guests at your next
+                        gathering.
+                    </p>
+
+                    <!-- Quick Info -->
+                    <div class="quick-info">
+                        <div class="info-item">
+                            <span class="info-label">Prep Time</span>
+                            <span class="info-value">15 mins</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Cook Time</span>
+                            <span class="info-value">30 mins</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Servings</span>
+                            <span class="info-value">4 people</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Difficulty</span>
+                            <span class="difficulty">Medium</span>
+                        </div>
+                    </div>
+
+                    <!-- Ingredients -->
+                    <div class="ingredients-section">
+                        <h3 class="section-header">Ingredients</h3>
+                        <div class="ingredient-group">
+                            <h4 class="ingredient-group-title">Main Ingredients</h4>
+                            <ul class="ingredients-list">
+                                <li>1½ cups Arborio rice</li>
+                                <li>300g mixed mushrooms, sliced</li>
+                                <li>1 medium onion, finely chopped</li>
+                                <li>3 cloves garlic, minced</li>
+                                <li>5 cups vegetable stock, warm</li>
+                                <li>½ cup dry white wine</li>
+                                <li>½ cup Parmesan cheese, grated</li>
+                                <li>3 tablespoons butter</li>
+                                <li>2 tablespoons olive oil</li>
+                                <li>Salt and black pepper to taste</li>
+                            </ul>
+                        </div>
+                        <div class="ingredient-group">
+                            <h4 class="ingredient-group-title">Optional Garnish</h4>
+                            <ul class="ingredients-list">
+                                <li>Fresh parsley, chopped</li>
+                                <li>Extra Parmesan shavings</li>
+                                <li>Truffle oil (for luxury)</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- Instructions -->
+                    <div class="instructions-section">
+                        <h3 class="section-header">Instructions</h3>
+                        <ol class="instructions-list">
+                            <li>Heat olive oil in a large pan and sauté mushrooms until golden. Set aside.</li>
+                            <li>In the same pan, add 1 tablespoon butter and sauté onion until translucent. Add garlic
+                                and cook for 1 minute.</li>
+                            <li>Add Arborio rice and toast for 2 minutes, stirring constantly until edges become
+                                translucent.</li>
+                            <li>Pour in white wine and stir until absorbed.</li>
+                            <li>Add warm stock one ladle at a time, stirring frequently. Wait until each addition is
+                                absorbed before adding more.</li>
+                            <li>After about 20 minutes, when rice is creamy and al dente, stir in mushrooms, remaining
+                                butter, and Parmesan.</li>
+                            <li>Season with salt and pepper. Serve immediately with garnish of your choice.</li>
+                        </ol>
+                    </div>
+
+                    <!-- Tips -->
+                    <div class="tips-section">
+                        <h4 class="tips-title">Pro Tips</h4>
+                        <ul class="tips-list">
+                            <li>Keep the stock warm throughout cooking for best results</li>
+                            <li>Stir frequently but not constantly - every 30 seconds is perfect</li>
+                            <li>For extra depth, add dried porcini mushrooms soaked in warm water</li>
+                            <li>Substitute wine with extra stock if preferred</li>
+                        </ul>
+                    </div>
+                </div>
+            </article>
+
+            <!-- Recipe 2: Honey Garlic Salmon -->
+            <article class="recipe-card">
+                <img src="https://images.unsplash.com/photo-1485921325833-c519f76c4927?w=800&h=600&fit=crop"
+                    alt="Honey Garlic Salmon" class="recipe-image">
+                <div class="recipe-content">
+                    <div class="recipe-header">
+                        <h2 class="recipe-title">Honey Garlic Salmon</h2>
+                        <p class="recipe-tagline">Quick and healthy weeknight winner</p>
+                    </div>
+
+                    <p class="recipe-intro">
+                        Sweet, savory, and perfectly flaky - this honey garlic salmon comes together in under 20
+                        minutes. It's a nutritious, restaurant-quality meal that's surprisingly simple to make at home.
+                    </p>
+
+                    <!-- Quick Info -->
+                    <div class="quick-info">
+                        <div class="info-item">
+                            <span class="info-label">Prep Time</span>
+                            <span class="info-value">5 mins</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Cook Time</span>
+                            <span class="info-value">12 mins</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Servings</span>
+                            <span class="info-value">4 people</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Difficulty</span>
+                            <span class="difficulty">Easy</span>
+                        </div>
+                    </div>
+
+                    <!-- Ingredients -->
+                    <div class="ingredients-section">
+                        <h3 class="section-header">Ingredients</h3>
+                        <div class="ingredient-group">
+                            <ul class="ingredients-list">
+                                <li>4 salmon fillets (about 150g each)</li>
+                                <li>3 tablespoons honey</li>
+                                <li>3 tablespoons soy sauce</li>
+                                <li>4 cloves garlic, minced</li>
+                                <li>1 tablespoon lemon juice</li>
+                                <li>1 teaspoon ginger, grated</li>
+                                <li>2 tablespoons olive oil</li>
+                                <li>Sesame seeds for garnish</li>
+                                <li>Green onions, sliced</li>
+                                <li>Salt and pepper to taste</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- Instructions -->
+                    <div class="instructions-section">
+                        <h3 class="section-header">Instructions</h3>
+                        <ol class="instructions-list">
+                            <li>Pat salmon fillets dry and season with salt and pepper.</li>
+                            <li>In a small bowl, whisk together honey, soy sauce, garlic, lemon juice, and ginger.</li>
+                            <li>Heat olive oil in a large skillet over medium-high heat.</li>
+                            <li>Place salmon skin-side up and sear for 4 minutes until golden.</li>
+                            <li>Flip salmon and pour honey garlic sauce over the fillets.</li>
+                            <li>Cook for another 4-5 minutes, spooning sauce over salmon frequently, until cooked
+                                through.</li>
+                            <li>Garnish with sesame seeds and green onions. Serve hot with rice or vegetables.</li>
+                        </ol>
+                    </div>
+
+                    <!-- Tips -->
+                    <div class="tips-section">
+                        <h4 class="tips-title">Pro Tips</h4>
+                        <ul class="tips-list">
+                            <li>Don't overcook - salmon should be slightly pink in the center</li>
+                            <li>For crispy skin, start cooking skin-side down and don't move it</li>
+                            <li>Double the sauce recipe if you like it extra saucy</li>
+                            <li>Works beautifully with trout or arctic char too</li>
+                        </ul>
+                    </div>
+                </div>
+            </article>
+
+            <!-- Recipe 3: Classic Tiramisu -->
+            <article class="recipe-card">
+                <img src="https://images.unsplash.com/photo-1571877227200-a0d98ea607e9?w=800&h=600&fit=crop"
+                    alt="Classic Tiramisu" class="recipe-image">
+                <div class="recipe-content">
+                    <div class="recipe-header">
+                        <h2 class="recipe-title">Classic Tiramisu</h2>
+                        <p class="recipe-tagline">Italian indulgence perfected</p>
+                    </div>
+
+                    <p class="recipe-intro">
+                        Layers of coffee-soaked ladyfingers and mascarpone cream create this iconic Italian dessert.
+                        No-bake and make-ahead friendly, it's the perfect ending to any dinner party or a luxurious
+                        weekend treat.
+                    </p>
+
+                    <!-- Quick Info -->
+                    <div class="quick-info">
+                        <div class="info-item">
+                            <span class="info-label">Prep Time</span>
+                            <span class="info-value">30 mins</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Chill Time</span>
+                            <span class="info-value">4 hours</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Servings</span>
+                            <span class="info-value">8 people</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Difficulty</span>
+                            <span class="difficulty">Easy</span>
+                        </div>
+                    </div>
+
+                    <!-- Ingredients -->
+                    <div class="ingredients-section">
+                        <h3 class="section-header">Ingredients</h3>
+                        <div class="ingredient-group">
+                            <h4 class="ingredient-group-title">Mascarpone Cream</h4>
+                            <ul class="ingredients-list">
+                                <li>500g mascarpone cheese</li>
+                                <li>4 large eggs, separated</li>
+                                <li>¾ cup granulated sugar</li>
+                                <li>1 teaspoon vanilla extract</li>
+                            </ul>
+                        </div>
+                        <div class="ingredient-group">
+                            <h4 class="ingredient-group-title">Assembly</h4>
+                            <ul class="ingredients-list">
+                                <li>300g ladyfinger biscuits</li>
+                                <li>1½ cups strong espresso, cooled</li>
+                                <li>3 tablespoons coffee liqueur (optional)</li>
+                                <li>Cocoa powder for dusting</li>
+                                <li>Dark chocolate shavings (optional)</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- Instructions -->
+                    <div class="instructions-section">
+                        <h3 class="section-header">Instructions</h3>
+                        <ol class="instructions-list">
+                            <li>Beat egg yolks with sugar until pale and thick (about 3 minutes). Add vanilla.</li>
+                            <li>Gently fold in mascarpone until smooth and creamy.</li>
+                            <li>In a separate bowl, whip egg whites to stiff peaks.</li>
+                            <li>Carefully fold egg whites into mascarpone mixture in three additions.</li>
+                            <li>Mix espresso with coffee liqueur in a shallow dish.</li>
+                            <li>Quickly dip ladyfingers in coffee (1 second each side) and arrange in a single layer in
+                                a dish.</li>
+                            <li>Spread half the mascarpone cream over ladyfingers. Repeat layers.</li>
+                            <li>Cover and refrigerate for at least 4 hours (overnight is best).</li>
+                            <li>Before serving, dust generously with cocoa powder and add chocolate shavings.</li>
+                        </ol>
+                    </div>
+
+                    <!-- Tips -->
+                    <div class="tips-section">
+                        <h4 class="tips-title">Pro Tips</h4>
+                        <ul class="tips-list">
+                            <li>Don't over-soak ladyfingers or they'll become mushy</li>
+                            <li>Use room temperature mascarpone for easier mixing</li>
+                            <li>For alcohol-free version, skip the liqueur and use vanilla in coffee</li>
+                            <li>Make it 24 hours ahead for best flavor development</li>
+                        </ul>
+                    </div>
+                </div>
+            </article>
+
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer>
+        <div id = footer-container>
+        <p>&copy; 2024 Savory Stories. All recipes crafted with love.</p>
+        <p>Share your creations with us on social media!</p>
+    </div>
+    </footer>
+</body>
+
+</html>
