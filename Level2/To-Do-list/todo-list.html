@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>To-Do List</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #5bc7da 0%, #edeced 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            width: 100%;
+            max-width: 600px;
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 28px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .header p {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+
+        .add-task-container {
+            padding: 20px 30px;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .input-wrapper {
+            display: flex;
+            gap: 10px;
+        }
+
+        #taskInput {
+            flex: 1;
+            padding: 12px 16px;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            font-size: 15px;
+            transition: border-color 0.3s;
+        }
+
+        #taskInput:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        #addBtn {
+            padding: 12px 24px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        #addBtn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+
+        #addBtn:active {
+            transform: translateY(0);
+        }
+
+        .tasks-container {
+            padding: 10px 30px 30px;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .task-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 16px;
+            background: #f9fafb;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            transition: all 0.3s;
+            border: 2px solid transparent;
+        }
+
+        .task-item:hover {
+            background: #f3f4f6;
+            border-color: #e5e7eb;
+        }
+
+        .task-item.completed {
+            opacity: 0.6;
+        }
+
+        .checkbox {
+            width: 20px;
+            height: 20px;
+            border: 2px solid #667eea;
+            border-radius: 50%;
+            cursor: pointer;
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+        }
+
+        .checkbox:hover {
+            background: #f0f0ff;
+        }
+
+        .checkbox.checked {
+            background: #667eea;
+        }
+
+        .checkbox.checked::after {
+            content: '✓';
+            color: rgb(255, 255, 255);
+            font-size: 14px;
+            font-weight: bold;
+        }
+
+        .task-content {
+            flex: 1;
+            display: flex;
+            align-items: center;
+        }
+
+        .task-text {
+            font-size: 15px;
+            color: #1f2937;
+            flex: 1;
+            padding: 4px 8px;
+            border: 2px solid transparent;
+            border-radius: 4px;
+            transition: border-color 0.2s;
+        }
+
+        .task-text.editing {
+            border-color: #667eea;
+            background: white;
+            outline: none;
+        }
+
+        .task-text.completed {
+            text-decoration: line-through;
+            color: #9ca3af;
+        }
+
+        .task-actions {
+            display: flex;
+            gap: 8px;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .task-item:hover .task-actions {
+            opacity: 1;
+        }
+
+        .btn {
+            padding: 6px 12px;
+            border: none;
+            border-radius: 6px;
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-weight: 500;
+        }
+
+        .edit-btn {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .edit-btn:hover {
+            background: #fde68a;
+        }
+
+        .delete-btn {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .delete-btn:hover {
+            background: #fecaca;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: #9ca3af;
+        }
+
+        .empty-state svg {
+            width: 80px;
+            height: 80px;
+            margin-bottom: 16px;
+            opacity: 0.5;
+        }
+
+        .stats {
+            padding: 16px 30px;
+            background: #f9fafb;
+            border-top: 1px solid #e5e7eb;
+            display: flex;
+            justify-content: space-between;
+            font-size: 14px;
+            color: #6b7280;
+        }
+
+        /* Scrollbar styling */
+        .tasks-container::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .tasks-container::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+
+        .tasks-container::-webkit-scrollbar-thumb {
+            background: #667eea;
+            border-radius: 4px;
+        }
+
+        .tasks-container::-webkit-scrollbar-thumb:hover {
+            background: #5568d3;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>My To-Do List</h1>
+            <p>Stay organized and productive</p>
+        </div>
+
+        <div class="add-task-container">
+            <div class="input-wrapper">
+                <input 
+                    type="text" 
+                    id="taskInput" 
+                    placeholder="What needs to be done?"
+                    autocomplete="off"
+                />
+                <button id="addBtn">Add Task</button>
+            </div>
+        </div>
+
+        <div class="tasks-container" id="tasksList">
+            <div class="empty-state">
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+                <p>No tasks yet. Add one to get started!</p>
+            </div>
+        </div>
+
+        <div class="stats">
+            <span id="totalTasks">0 tasks</span>
+            <span id="completedTasks">0 completed</span>
+        </div>
+    </div>
+
+    <script>
+        // Get elements
+        const taskInput = document.getElementById('taskInput');
+        const addBtn = document.getElementById('addBtn');
+        const tasksList = document.getElementById('tasksList');
+        const totalTasksEl = document.getElementById('totalTasks');
+        const completedTasksEl = document.getElementById('completedTasks');
+
+        // Initialize tasks array from localStorage
+        let tasks = JSON.parse(localStorage.getItem('tasks')) || [];
+
+        // Load tasks on page load
+        window.addEventListener('DOMContentLoaded', () => {
+            renderTasks();
+        });
+
+        // Add task event listeners
+        addBtn.addEventListener('click', addTask);
+        taskInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') addTask();
+        });
+
+        // Add new task
+        function addTask() {
+            const taskText = taskInput.value.trim();
+            
+            if (taskText === '') {
+                taskInput.focus();
+                return;
+            }
+
+            const newTask = {
+                id: Date.now(),
+                text: taskText,
+                completed: false
+            };
+
+            tasks.push(newTask);
+            saveTasks();
+            renderTasks();
+            taskInput.value = '';
+            taskInput.focus();
+        }
+
+        // Render all tasks
+        function renderTasks() {
+            if (tasks.length === 0) {
+                tasksList.innerHTML = `
+                    <div class="empty-state">
+                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                        <p>No tasks yet. Add one to get started!</p>
+                    </div>
+                `;
+                updateStats();
+                return;
+            }
+
+            tasksList.innerHTML = tasks.map(task => `
+                <div class="task-item ${task.completed ? 'completed' : ''}" data-id="${task.id}">
+                    <div class="checkbox ${task.completed ? 'checked' : ''}" onclick="toggleTask(${task.id})"></div>
+                    <div class="task-content">
+                        <span class="task-text ${task.completed ? 'completed' : ''}" 
+                              contenteditable="false"
+                              data-id="${task.id}"
+                              onblur="saveEdit(${task.id}, this)"
+                              onkeypress="handleEditKeypress(event, ${task.id}, this)"
+                        >${task.text}</span>
+                    </div>
+                    <div class="task-actions">
+                        <button class="btn edit-btn" onclick="editTask(${task.id})">Edit</button>
+                        <button class="btn delete-btn" onclick="deleteTask(${task.id})">Delete</button>
+                    </div>
+                </div>
+            `).join('');
+
+            updateStats();
+        }
+
+        // Toggle task completion
+        function toggleTask(id) {
+            const task = tasks.find(t => t.id === id);
+            if (task) {
+                task.completed = !task.completed;
+                saveTasks();
+                renderTasks();
+            }
+        }
+
+        // Edit task
+        function editTask(id) {
+            const taskElement = document.querySelector(`[data-id="${id}"].task-text`);
+            if (taskElement) {
+                taskElement.contentEditable = true;
+                taskElement.classList.add('editing');
+                taskElement.focus();
+                
+                // Select all text
+                const range = document.createRange();
+                range.selectNodeContents(taskElement);
+                const selection = window.getSelection();
+                selection.removeAllRanges();
+                selection.addRange(range);
+            }
+        }
+
+        // Save edited task
+        function saveEdit(id, element) {
+            const newText = element.textContent.trim();
+            
+            if (newText === '') {
+                renderTasks();
+                return;
+            }
+
+            const task = tasks.find(t => t.id === id);
+            if (task && task.text !== newText) {
+                task.text = newText;
+                saveTasks();
+            }
+            
+            element.contentEditable = false;
+            element.classList.remove('editing');
+        }
+
+        // Handle Enter key during edit
+        function handleEditKeypress(event, id, element) {
+            if (event.key === 'Enter') {
+                event.preventDefault();
+                element.blur();
+            }
+        }
+
+        // Delete task
+        function deleteTask(id) {
+            tasks = tasks.filter(t => t.id !== id);
+            saveTasks();
+            renderTasks();
+        }
+
+        // Save tasks to localStorage
+        function saveTasks() {
+            localStorage.setItem('tasks', JSON.stringify(tasks));
+        }
+
+        // Update statistics
+        function updateStats() {
+            const total = tasks.length;
+            const completed = tasks.filter(t => t.completed).length;
+            
+            totalTasksEl.textContent = `${total} ${total === 1 ? 'task' : 'tasks'}`;
+            completedTasksEl.textContent = `${completed} completed`;
+        }
+    </script>
+</body>
+</html>

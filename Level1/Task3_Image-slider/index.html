@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Image Slider</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Image Slider Carousel</h1>
+        
+        <div class="slider-container">
+            <!-- Slider Wrapper -->
+            <div class="slider">
+                <!-- Slides -->
+                <div class="slide active">
+                    <img src="https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=1200&h=600&fit=crop" alt="Mountain Landscape">
+                    <div class="slide-caption">Beautiful Mountain View</div>
+                </div>
+                
+                <div class="slide">
+                    <img src="https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=1200&h=600&fit=crop" alt="Beach Sunset">
+                    <div class="slide-caption">Tropical Beach Paradise</div>
+                </div>
+                
+                <div class="slide">
+                    <img src="https://images.unsplash.com/photo-1511593358241-7eea1f3c84e5?w=1200&h=600&fit=crop" alt="Forest Path">
+                    <div class="slide-caption">Enchanted Forest Trail</div>
+                </div>
+                
+                <div class="slide">
+                    <img src="https://images.unsplash.com/photo-1480714378408-67cf0d13bc1b?w=1200&h=600&fit=crop" alt="City Skyline">
+                    <div class="slide-caption">Modern City Skyline</div>
+                </div>
+                
+                <div class="slide">
+                    <img src="https://images.unsplash.com/photo-1472214103451-9374bd1c798e?w=1200&h=600&fit=crop" alt="Desert Landscape">
+                    <div class="slide-caption">Desert Dunes at Sunset</div>
+                </div>
+            </div>
+            
+            <!-- Navigation Arrows -->
+            <button class="nav-btn prev" aria-label="Previous slide">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polyline points="15 18 9 12 15 6"></polyline>
+                </svg>
+            </button>
+            
+            <button class="nav-btn next" aria-label="Next slide">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polyline points="9 18 15 12 9 6"></polyline>
+                </svg>
+            </button>
+            
+            <!-- Dot Indicators -->
+            <div class="dots-container">
+                <span class="dot active" data-slide="0"></span>
+                <span class="dot" data-slide="1"></span>
+                <span class="dot" data-slide="2"></span>
+                <span class="dot" data-slide="3"></span>
+                <span class="dot" data-slide="4"></span>
+            </div>
+        </div>
+        
+        <!-- Controls Info -->
+        <div class="controls-info">
+            <!-- <p>⏸️ Hover to pause auto-play | ← → Use arrow keys to navigate</p> -->
+        </div>
+    </div>
+    
+    <script src="js/slider.js"></script>
+</body>
+</html>
