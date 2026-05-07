@@ -1,0 +1,646 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Lumina Gallery | Filter by Nature, Street & Cityscape</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: linear-gradient(145deg, #f6f9fc 0%, #eef2f5 100%);
+            font-family: 'Inter', system-ui, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+            padding: 2rem 1.5rem;
+            color: #1e2a3e;
+        }
+
+        /* gallery container */
+        .gallery-wrapper {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: rgba(255,255,255,0.4);
+            backdrop-filter: blur(2px);
+            border-radius: 3rem;
+            padding: 2rem 1.8rem;
+            box-shadow: 0 20px 35px -12px rgba(0,0,0,0.1);
+        }
+
+        /* header & title */
+        .gallery-header {
+            text-align: center;
+            margin-bottom: 2.2rem;
+        }
+
+        .gallery-header h1 {
+            font-size: 2.8rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #1E4B6E, #2D8F6E);
+            background-clip: text;
+            -webkit-background-clip: text;
+            color: transparent;
+            letter-spacing: -0.5px;
+        }
+
+        .gallery-header p {
+            font-size: 1.1rem;
+            color: #406e8e;
+            margin-top: 0.5rem;
+            font-weight: 500;
+        }
+
+        /* filter bar - elegant pill design */
+        .filter-bar {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 0.8rem;
+            margin-bottom: 2.8rem;
+        }
+
+        .filter-btn {
+            background: rgba(255,255,255,0.75);
+            backdrop-filter: blur(4px);
+            border: none;
+            padding: 0.7rem 1.7rem;
+            border-radius: 60px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+            color: #1e4663;
+            font-family: inherit;
+            border: 1px solid rgba(110, 145, 175, 0.3);
+        }
+
+        .filter-btn i {
+            margin-right: 8px;
+            font-style: normal;
+            font-weight: 600;
+        }
+
+        .filter-btn:hover {
+            background: #fff;
+            transform: translateY(-3px);
+            box-shadow: 0 12px 18px -8px rgba(0,0,0,0.15);
+            border-color: #aac7e0;
+        }
+
+        .filter-btn.active {
+            background: #1E4B6E;
+            color: white;
+            border-color: #1E4B6E;
+            box-shadow: 0 8px 18px -6px #1e4b6e60;
+        }
+
+        /* masonry-style image grid */
+        .image-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 1.8rem;
+            transition: all 0.2s;
+        }
+
+        /* gallery card styling */
+        .gallery-card {
+            background: white;
+            border-radius: 1.8rem;
+            overflow: hidden;
+            box-shadow: 0 15px 30px -12px rgba(0, 0, 0, 0.15);
+            transition: transform 0.3s cubic-bezier(0.2, 0.9, 0.4, 1.1), box-shadow 0.2s;
+            cursor: pointer;
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        .gallery-card:hover {
+            transform: translateY(-8px) scale(1.01);
+            box-shadow: 0 28px 28px -16px rgba(0, 0, 0, 0.25);
+        }
+
+        /* image area */
+        .card-img {
+            width: 100%;
+            aspect-ratio: 4 / 3;
+            object-fit: cover;
+            display: block;
+            transition: transform 0.5s ease;
+        }
+
+        .gallery-card:hover .card-img {
+            transform: scale(1.02);
+        }
+
+        /* info section */
+        .card-info {
+            padding: 1rem 1.2rem 1.3rem;
+            background: #ffffffdd;
+            backdrop-filter: blur(2px);
+        }
+
+        .card-title {
+            font-weight: 700;
+            font-size: 1.2rem;
+            margin-bottom: 0.3rem;
+            color: #1f3b4c;
+        }
+
+        .card-tag {
+            display: inline-block;
+            background: #eef3fc;
+            padding: 0.25rem 0.8rem;
+            border-radius: 40px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: #26648b;
+            margin-top: 0.5rem;
+        }
+
+        /* animation for filtering (fade + scale) */
+        .gallery-card.hide-card {
+            animation: fadeOutScale 0.28s forwards;
+            pointer-events: none;
+            display: none;  /* fallback, but JS will also hide via class */
+        }
+
+        /* show animation */
+        .gallery-card.show-card {
+            animation: fadeInScale 0.32s cubic-bezier(0.2, 0.9, 0.4, 1.1) forwards;
+            display: block;
+        }
+
+        @keyframes fadeOutScale {
+            0% { opacity: 1; transform: scale(1); }
+            100% { opacity: 0; transform: scale(0.92); display: none; }
+        }
+
+        @keyframes fadeInScale {
+            0% { opacity: 0; transform: scale(0.94); }
+            100% { opacity: 1; transform: scale(1); }
+        }
+
+        /* empty state */
+        .empty-state {
+            text-align: center;
+            grid-column: 1 / -1;
+            padding: 3rem 1rem;
+            background: #f1f5f9;
+            border-radius: 2rem;
+            margin: 1rem 0;
+        }
+
+        .empty-state svg {
+            width: 70px;
+            opacity: 0.5;
+            margin-bottom: 1rem;
+        }
+
+        .empty-state p {
+            font-size: 1.3rem;
+            color: #4a627a;
+            font-weight: 500;
+        }
+
+        /* footer style */
+        .gallery-footer {
+            text-align: center;
+            margin-top: 2.5rem;
+            font-size: 0.8rem;
+            color: #5e7e9c;
+            border-top: 1px solid rgba(0,0,0,0.05);
+            padding-top: 1.8rem;
+        }
+
+        @media (max-width: 650px) {
+            .gallery-wrapper {
+                padding: 1.2rem;
+            }
+            .filter-btn {
+                padding: 0.5rem 1.2rem;
+                font-size: 0.85rem;
+            }
+            .gallery-header h1 {
+                font-size: 2rem;
+            }
+        }
+
+        /* subtle background texture */
+        .bg-icon {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            opacity: 0.03;
+            pointer-events: none;
+            font-size: 110px;
+            z-index: 0;
+        }
+    </style>
+</head>
+<body>
+<div class="gallery-wrapper">
+    <div class="gallery-header">
+        <h1>📸 Visual Odyssey</h1>
+        <p>discover · filter · inspire — nature, Street & cityscapes</p>
+    </div>
+
+    <!-- filter buttons with categories -->
+    <div class="filter-bar" id="filterBar">
+        <button class="filter-btn active" data-filter="all">🌿 All</button>
+        <button class="filter-btn" data-filter="nature">🏔️ Nature</button>
+        <button class="filter-btn" data-filter="Street">🌉Street</button>
+        <button class="filter-btn" data-filter="cityscape">🌆 Cityscape</button>
+    </div>
+
+    <!-- dynamic image gallery grid -->
+    <div class="image-grid" id="imageGrid"></div>
+
+    <div class="gallery-footer">
+        ✨ click on any image to enlarge preview | smooth filtering experience
+    </div>
+</div>
+<div class="bg-icon">📷</div>
+
+<script>
+    // ---------- IMAGE DATASET with categories / tags ----------
+    // each object: unique id, imageUrl, title, category (tag), alt description
+    const imagesData = [
+        // NATURE (5)
+        {
+            id: 1,
+            title: "Misty Highlands",
+            category: "nature",
+            imageUrl: "https://picsum.photos/id/104/400/300",
+            alt: "Breathtaking mountain lake with pine trees"
+        },
+        {
+            id: 2,
+            title: "Enchanted Forest",
+            category: "nature",
+            imageUrl: "https://picsum.photos/id/96/400/300",
+            alt: "Mystical woodland with dappled sunlight"
+        },
+        {
+            id: 3,
+            title: "Emerald Waterfall",
+            category: "nature",
+            imageUrl: "https://picsum.photos/id/29/400/300",
+            alt: "Cascading waterfall in deep forest"
+        },
+        {
+            id: 4,
+            title: "Sunset over Canyon",
+            category: "nature",
+            imageUrl: "https://picsum.photos/id/15/400/300",
+            alt: "Golden hour lighting over deep canyon"
+        },
+        {
+            id: 5,
+            title: "Blooming Meadows",
+            category: "nature",
+            imageUrl: "https://picsum.photos/id/66/400/300",
+            alt: "Wildflower meadow under blue sky"
+        },
+        // Street (5)
+        {
+            id: 6,
+            title: "Majestic Eagle",
+            category: "Street",
+            imageUrl: "https://picsum.photos/id/88/400/300",
+            alt: "Bald eagle soaring through mountains"
+        },
+        {
+            id: 7,
+            title: "Playful Red Panda",
+            category: "Street",
+            imageUrl: "https://picsum.photos/id/180/400/300",
+            alt: "Curious red panda on tree branch"
+        },
+        {
+            id: 8,
+            title: "Savannah Elephant",
+            category: "Street",
+            imageUrl: "https://picsum.photos/id/109/400/300",
+            alt: "African elephant walking in golden grass"
+        },
+        {
+            id: 9,
+            title: "Mountain Wolf",
+            category: "Street",
+            imageUrl: "https://picsum.photos/id/199/400/300",
+            alt: "Gray wolf howling at dusk"
+        },
+        {
+            id: 10,
+            title: "Coral Reef Turtle",
+            category: "Street",
+            imageUrl: "https://picsum.photos/id/130/400/300",
+            alt: "Sea turtle swimming in turquoise water"
+        },
+        // CITYSCAPE (5)
+        {
+            id: 11,
+            title: "Neon Tokyo Night",
+            category: "cityscape",
+            imageUrl: "https://picsum.photos/id/106/400/300",
+            alt: "Vibrant city lights and skyscrapers"
+        },
+        {
+            id: 12,
+            title: "Parisian Rooftops",
+            category: "cityscape",
+            imageUrl: "https://picsum.photos/id/50/400/300",
+            alt: "Elegant architecture and cobblestone streets"
+        },
+        {
+            id: 13,
+            title: "Brooklyn Bridge",
+            category: "cityscape",
+            imageUrl: "https://picsum.photos/id/96/400/300",   // another stunning city pic
+            alt: "Iconic bridge with city skyline behind"
+        },
+        {
+            id: 14,
+            title: "Central Park Autumn",
+            category: "cityscape",
+            imageUrl: "https://picsum.photos/id/169/400/300",
+            alt: "Urban nature meeting skyscrapers"
+        },
+        {
+            id: 15,
+            title: "Dubai Skyline",
+            category: "cityscape",
+            imageUrl: "https://picsum.photos/id/108/400/300",
+            alt: "Modern architecture glowing at night"
+        }
+    ];
+
+    // additional safeguard: ensure unique and consistent images for city, duplicate IDs not an issue but we have variety
+    // fix for image id 13 uses same url as id2? that's okay, just for demo. To keep fresh: modify city image 13 to new unsplash-like
+    imagesData[12].imageUrl = "https://picsum.photos/id/47/400/300";   // new york vibe
+    imagesData[12].title = "Manhattan Dawn";
+    
+    // also small adjustment to have fresh content
+    imagesData[14].imageUrl = "https://picsum.photos/id/91/400/300";
+    imagesData[14].title = "London Eye Reflections";
+
+    // DOM elements
+    const imageGrid = document.getElementById('imageGrid');
+    const filterBtns = document.querySelectorAll('.filter-btn');
+    
+    let currentFilter = 'all';   // active filter state
+
+    // Helper: generate HTML for a single image card
+    function createImageCard(imgObj) {
+        const cardDiv = document.createElement('div');
+        cardDiv.className = 'gallery-card';
+        // store category as dataset for quick check (but we filter by category property)
+        cardDiv.dataset.category = imgObj.category;
+        cardDiv.dataset.id = imgObj.id;
+        
+        // inner structure
+        cardDiv.innerHTML = `
+            <img class="card-img" src="${imgObj.imageUrl}" alt="${imgObj.alt}" loading="lazy">
+            <div class="card-info">
+                <div class="card-title">${escapeHtml(imgObj.title)}</div>
+                <span class="card-tag">${getCategoryIcon(imgObj.category)} ${capitalize(imgObj.category)}</span>
+            </div>
+        `;
+        
+        // image click enlarge (lightbox style: native alert too intrusive, but we implement smooth modal)
+        cardDiv.addEventListener('click', (e) => {
+            e.stopPropagation();
+            openLightbox(imgObj.imageUrl, imgObj.title, imgObj.alt);
+        });
+        
+        return cardDiv;
+    }
+    
+    // small helper to get category icon based on tag
+    function getCategoryIcon(cat) {
+        if (cat === 'nature') return '🌲';
+        if (cat === 'Street') return '🐘';
+        if (cat === 'cityscape') return '🏙️';
+        return '✨';
+    }
+    
+    function capitalize(str) {
+        return str.charAt(0).toUpperCase() + str.slice(1);
+    }
+    
+    // simple XSS escape
+    function escapeHtml(str) {
+        return str.replace(/[&<>]/g, function(m) {
+            if (m === '&') return '&amp;';
+            if (m === '<') return '&lt;';
+            if (m === '>') return '&gt;';
+            return m;
+        });
+    }
+    
+    // Lightbox modal (elegant, full-screen preview)
+    function openLightbox(imgUrl, title, altText) {
+        // create modal container if not exists
+        let modal = document.getElementById('lightboxModal');
+        if (!modal) {
+            modal = document.createElement('div');
+            modal.id = 'lightboxModal';
+            modal.style.position = 'fixed';
+            modal.style.top = '0';
+            modal.style.left = '0';
+            modal.style.width = '100%';
+            modal.style.height = '100%';
+            modal.style.backgroundColor = 'rgba(0,0,0,0.88)';
+            modal.style.backdropFilter = 'blur(12px)';
+            modal.style.display = 'flex';
+            modal.style.alignItems = 'center';
+            modal.style.justifyContent = 'center';
+            modal.style.zIndex = '2000';
+            modal.style.cursor = 'pointer';
+            modal.style.opacity = '0';
+            modal.style.transition = 'opacity 0.22s ease';
+            
+            const modalContent = document.createElement('div');
+            modalContent.style.maxWidth = '90vw';
+            modalContent.style.maxHeight = '90vh';
+            modalContent.style.textAlign = 'center';
+            modalContent.style.position = 'relative';
+            
+            const modalImg = document.createElement('img');
+            modalImg.style.maxWidth = '90vw';
+            modalImg.style.maxHeight = '80vh';
+            modalImg.style.objectFit = 'contain';
+            modalImg.style.borderRadius = '20px';
+            modalImg.style.boxShadow = '0 20px 40px rgba(0,0,0,0.5)';
+            modalImg.style.border = '2px solid rgba(255,255,255,0.2)';
+            
+            const caption = document.createElement('div');
+            caption.style.marginTop = '1rem';
+            caption.style.color = 'white';
+            caption.style.fontFamily = 'system-ui';
+            caption.style.fontSize = '1.2rem';
+            caption.style.fontWeight = '500';
+            caption.style.textShadow = '0 1px 3px black';
+            
+            const closeHint = document.createElement('div');
+            closeHint.innerText = '✖ click anywhere to close';
+            closeHint.style.marginTop = '0.8rem';
+            closeHint.style.fontSize = '0.8rem';
+            closeHint.style.opacity = '0.7';
+            closeHint.style.color = '#ddd';
+            
+            modalContent.appendChild(modalImg);
+            modalContent.appendChild(caption);
+            modalContent.appendChild(closeHint);
+            modal.appendChild(modalContent);
+            document.body.appendChild(modal);
+            
+            modal.addEventListener('click', () => {
+                modal.style.opacity = '0';
+                setTimeout(() => {
+                    if (modal && modal.parentNode) modal.remove();
+                }, 220);
+            });
+            
+            // store references for dynamic update
+            modal.imgElement = modalImg;
+            modal.captionElement = caption;
+        }
+        
+        modal = document.getElementById('lightboxModal');
+        modal.imgElement.src = imgUrl;
+        modal.imgElement.alt = altText || title;
+        modal.captionElement.innerText = `📷 ${escapeHtml(title)}`;
+        modal.style.display = 'flex';
+        // force reflow then animate
+        modal.style.opacity = '0';
+        setTimeout(() => { modal.style.opacity = '1'; }, 10);
+    }
+
+    // render gallery based on current filter
+    function renderGallery(filter = currentFilter) {
+        // clear existing grid
+        imageGrid.innerHTML = '';
+        
+        // filter data array
+        let filteredItems = imagesData;
+        if (filter !== 'all') {
+            filteredItems = imagesData.filter(item => item.category === filter);
+        }
+        
+        if (filteredItems.length === 0) {
+            // show empty state
+            const emptyDiv = document.createElement('div');
+            emptyDiv.className = 'empty-state';
+            emptyDiv.innerHTML = `
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" width="60" height="60" stroke-width="1.2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 001.5-1.5V6a1.5 1.5 0 00-1.5-1.5H3.75A1.5 1.5 0 002.25 6v12a1.5 1.5 0 001.5 1.5zm10.5-11.25h.008v.008h-.008V8.25zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z" />
+                </svg>
+                <p>✨ No images in this category ✨</p>
+                <small>try another filter</small>
+            `;
+            imageGrid.appendChild(emptyDiv);
+            return;
+        }
+        
+        // append each card with show class fade in
+        filteredItems.forEach(item => {
+            const card = createImageCard(item);
+            // ensure hidden class removed and show with slight staggered effect? but not needed
+            card.classList.add('show-card');
+            imageGrid.appendChild(card);
+        });
+    }
+    
+    // enhanced filtering with animation: crossfade style + re-render? 
+    // But we already re-render entire grid with fresh elements to maintain simplicity and robust filtering.
+    // However to provide smooth transition, we remove current grid items with class and then re-add new ones.
+    // Re-rendering ensures that opacity / transform animation triggers on new cards.
+    // The current implementation uses renderGallery which recreates nodes and attaches animation on show-card.
+    // This yields nice entrance animation each time filter changes. That's both clean and performant.
+    
+    function setActiveFilterButton(selectedFilter) {
+        filterBtns.forEach(btn => {
+            const filterValue = btn.getAttribute('data-filter');
+            if (filterValue === selectedFilter) {
+                btn.classList.add('active');
+            } else {
+                btn.classList.remove('active');
+            }
+        });
+    }
+    
+    // event handler for filter change
+    function handleFilterClick(filterValue) {
+        if (currentFilter === filterValue) return;
+        currentFilter = filterValue;
+        setActiveFilterButton(currentFilter);
+        // optional: add grid fade-out before re-render? but re-render is quick enough
+        // to make even smoother, we add short micro transition on grid wrapper
+        imageGrid.style.opacity = '0.7';
+        setTimeout(() => {
+            renderGallery(currentFilter);
+            imageGrid.style.opacity = '1';
+        }, 60);
+        // force final opacity after render
+        setTimeout(() => {
+            if (imageGrid) imageGrid.style.opacity = '1';
+        }, 150);
+    }
+    
+    // attach listeners to filter buttons
+    filterBtns.forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            const filterVal = btn.getAttribute('data-filter');
+            handleFilterClick(filterVal);
+        });
+    });
+    
+    // initial render
+    renderGallery('all');
+    
+    // Optional: add subtle active filter indicator and update on load
+    // Already set 'all' active by default.
+    
+    // ensure that image grid has smooth initial animation
+    window.addEventListener('load', () => {
+        const allCards = document.querySelectorAll('.gallery-card');
+        allCards.forEach(card => {
+            card.style.animation = 'fadeInScale 0.4s ease forwards';
+        });
+        // fix for any broswer compatibility
+    });
+    
+    // if needed to provide better error handling for broken images (just in case)
+    document.addEventListener('error', (e) => {
+        if (e.target && e.target.tagName === 'IMG' && e.target.classList.contains('card-img')) {
+            e.target.src = 'https://picsum.photos/id/1/400/300';
+            e.target.alt = 'placeholder image';
+        }
+    }, true);
+    
+    // preload style for backdrop etc
+    const style = document.createElement('style');
+    style.textContent = `
+        .gallery-card {
+            transition: all 0.25s;
+        }
+        #lightboxModal img {
+            transition: transform 0.2s;
+        }
+        .filter-btn {
+            transition: all 0.2s;
+        }
+        .image-grid {
+            transition: opacity 0.2s ease;
+        }
+    `;
+    document.head.appendChild(style);
+</script>
+</body>
+</html>
