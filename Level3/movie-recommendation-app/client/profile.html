@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profile - MovieFlix</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="logo">
+                <a href="index.html">
+                    <i class="fas fa-film"></i>
+                    <span>MovieFlix</span>
+                </a>
+            </div>
+            <div class="nav-links" id="navLinks">
+                <a href="index.html" class="nav-link">Home</a>
+                <a href="movies.html" class="nav-link">Movies</a>
+                <a href="recommendations.html" class="nav-link">Recommendations</a>
+                <a href="profile.html" class="nav-link active">Profile</a>
+            </div>
+            <div class="nav-actions">
+                <div class="user-menu" id="userMenu">
+                    <button class="user-btn" id="userMenuBtn">
+                        <i class="fas fa-user-circle"></i>
+                        <span id="userName"></span>
+                        <i class="fas fa-chevron-down"></i>
+                    </button>
+                    <div class="dropdown-menu" id="dropdownMenu">
+                        <a href="profile.html"><i class="fas fa-user"></i> Profile</a>
+                        <a href="#" id="logoutBtn"><i class="fas fa-sign-out-alt"></i> Logout</a>
+                    </div>
+                </div>
+            </div>
+            <button class="mobile-menu-btn" id="mobileMenuBtn">
+                <i class="fas fa-bars"></i>
+            </button>
+        </div>
+    </nav>
+
+    <main>
+        <div class="container">
+            <div class="profile-section">
+                <div class="profile-header">
+                    <i class="fas fa-user-circle"></i>
+                    <h2 id="profileName"></h2>
+                    <p id="profileEmail"></p>
+                </div>
+                
+                <div class="profile-tabs">
+                    <button class="profile-tab-btn active" data-tab="favorites">
+                        <i class="fas fa-heart"></i> Favorite Genres
+                    </button>
+                    <button class="profile-tab-btn" data-tab="ratings">
+                        <i class="fas fa-star"></i> My Ratings
+                    </button>
+                    <button class="profile-tab-btn" data-tab="watchlist">
+                        <i class="fas fa-bookmark"></i> Watchlist
+                    </button>
+                </div>
+                
+                <div id="favoritesTab" class="profile-tab-content active">
+                    <div class="genres-selection">
+                        <h3>Select Your Favorite Genres</h3>
+                        <p>Choose genres you love to get better recommendations</p>
+                        <div class="genres-grid" id="genresGrid"></div>
+                        <button class="btn btn-primary" id="saveGenresBtn">Save Preferences</button>
+                    </div>
+                </div>
+                
+                <div id="ratingsTab" class="profile-tab-content">
+                    <div class="rated-movies" id="ratedMovies"></div>
+                </div>
+                
+                <div id="watchlistTab" class="profile-tab-content">
+                    <div class="watchlist-movies" id="watchlistMovies"></div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <div id="toastContainer" class="toast-container"></div>
+
+    <style>
+        .profile-section {
+            padding: 2rem;
+        }
+        
+        .profile-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+        
+        .profile-header i {
+            font-size: 4rem;
+            color: var(--primary-color);
+        }
+        
+        .profile-header h2 {
+            margin-top: 1rem;
+            font-size: 1.5rem;
+        }
+        
+        .profile-tabs {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 1rem;
+            flex-wrap: wrap;
+        }
+        
+        .profile-tab-btn {
+            padding: 0.75rem 1.5rem;
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            cursor: pointer;
+            font-size: 1rem;
+            transition: all 0.3s;
+            border-radius: 8px;
+        }
+        
+        .profile-tab-btn:hover {
+            color: var(--primary-color);
+        }
+        
+        .profile-tab-btn.active {
+            color: var(--primary-color);
+            background: rgba(229, 9, 20, 0.1);
+        }
+        
+        .profile-tab-content {
+            display: none;
+            animation: fadeIn 0.3s;
+        }
+        
+        .profile-tab-content.active {
+            display: block;
+        }
+        
+        .genres-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 1rem;
+            margin: 2rem 0;
+        }
+        
+        .genre-option {
+            background: var(--background-light);
+            padding: 1rem;
+            text-align: center;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: 2px solid transparent;
+        }
+        
+        .genre-option:hover {
+            transform: translateY(-2px);
+        }
+        
+        .genre-option.selected {
+            border-color: var(--primary-color);
+            background: rgba(229, 9, 20, 0.1);
+        }
+        
+        .rating-card, .watchlist-card {
+            background: var(--background-light);
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        
+        .rating-card img, .watchlist-card img {
+            width: 60px;
+            height: 90px;
+            object-fit: cover;
+            border-radius: 4px;
+        }
+        
+        .rating-info, .watchlist-info {
+            flex: 1;
+        }
+        
+        .rating-info h4, .watchlist-info h4 {
+            margin-bottom: 0.25rem;
+        }
+        
+        .rating-value {
+            color: #ffd700;
+            font-weight: bold;
+        }
+        
+        .remove-btn {
+            background: var(--error-color);
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        
+        .remove-btn:hover {
+            background: #d32f2f;
+        }
+        
+        @media (max-width: 768px) {
+            .rating-card, .watchlist-card {
+                flex-direction: column;
+                text-align: center;
+            }
+            
+            .genres-grid {
+                grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            }
+        }
+    </style>
+
+    <script src="js/api.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/components.js"></script>
+    <script src="js/watchlist.js"></script>
+</body>
+</html>

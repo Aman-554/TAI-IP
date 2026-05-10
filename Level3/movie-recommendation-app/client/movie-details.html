@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Movie Details - MovieFlix</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="logo">
+                <a href="index.html">
+                    <i class="fas fa-film"></i>
+                    <span>MovieFlix</span>
+                </a>
+            </div>
+            <div class="nav-links" id="navLinks">
+                <a href="index.html" class="nav-link">Home</a>
+                <a href="movies.html" class="nav-link">Movies</a>
+                <a href="recommendations.html" class="nav-link protected-link">Recommendations</a>
+                <a href="profile.html" class="nav-link protected-link">Profile</a>
+            </div>
+            <div class="nav-actions">
+                <div class="auth-buttons" id="authButtons">
+                    <a href="login.html" class="btn btn-outline">Login</a>
+                    <a href="register.html" class="btn btn-primary">Register</a>
+                </div>
+                <div class="user-menu" id="userMenu" style="display: none;">
+                    <button class="user-btn" id="userMenuBtn">
+                        <i class="fas fa-user-circle"></i>
+                        <span id="userName"></span>
+                        <i class="fas fa-chevron-down"></i>
+                    </button>
+                    <div class="dropdown-menu" id="dropdownMenu">
+                        <a href="profile.html"><i class="fas fa-user"></i> Profile</a>
+                        <a href="#" id="logoutBtn"><i class="fas fa-sign-out-alt"></i> Logout</a>
+                    </div>
+                </div>
+            </div>
+            <button class="mobile-menu-btn" id="mobileMenuBtn">
+                <i class="fas fa-bars"></i>
+            </button>
+        </div>
+    </nav>
+
+    <main>
+        <div class="container">
+            <div class="movie-details" id="movieDetails">
+                <div class="spinner"></div>
+            </div>
+            
+            <div class="section">
+                <h3>Similar Movies</h3>
+                <div class="movies-grid" id="similarMovies"></div>
+            </div>
+        </div>
+    </main>
+
+    <div id="toastContainer" class="toast-container"></div>
+
+    <style>
+        .movie-details {
+            padding: 2rem 0;
+        }
+        
+        .movie-details-content {
+            display: grid;
+            grid-template-columns: 300px 1fr;
+            gap: 2rem;
+            background: var(--background-light);
+            border-radius: 12px;
+            padding: 2rem;
+        }
+        
+        .movie-details-poster img {
+            width: 100%;
+            border-radius: 8px;
+        }
+        
+        .movie-details-info h1 {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .movie-meta {
+            color: var(--text-secondary);
+            margin-bottom: 1rem;
+        }
+        
+        .movie-genres {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+            margin: 1rem 0;
+        }
+        
+        .genre-tag {
+            background: var(--background-dark);
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+        }
+        
+        .movie-overview {
+            margin: 1rem 0;
+            line-height: 1.8;
+        }
+        
+        .rating-section {
+            margin: 1rem 0;
+            padding: 1rem;
+            background: var(--background-dark);
+            border-radius: 8px;
+        }
+        
+        .action-buttons {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+        
+        @media (max-width: 768px) {
+            .movie-details-content {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+
+    <script src="js/api.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/components.js"></script>
+    <script>
+        const urlParams = new URLSearchParams(window.location.search);
+        const movieId = urlParams.get('id');
+        let userRating = null;
+        let watchlistId = null;
+        
+        document.addEventListener('DOMContentLoaded', async () => {
+            if (!movieId) {
+                window.location.href = 'movies.html';
+                return;
+            }
+            
+            await loadMovieDetails();
+            await loadSimilarMovies();
+            
+            if (authManager.user) {
+                await loadUserRating();
+                await checkWatchlist();
+            }
+        });
+        
+        async function loadMovieDetails() {
+            const container = document.getElementById('movieDetails');
+            
+            try {
+                const movie = await api.getMovieDetails(movieId);
+                
+                const posterPath = movie.poster_path 
+                    ? `https://image.tmdb.org/t/p/w500${movie.poster_path}`
+                    : 'https://via.placeholder.com/500x750?text=No+Poster';
+                
+                const backdropPath = movie.backdrop_path
+                    ? `https://image.tmdb.org/t/p/original${movie.backdrop_path}`
+                    : '';
+                
+                container.innerHTML = `
+                    <div class="movie-details-content">
+                        <div class="movie-details-poster">
+                            <img src="${posterPath}" alt="${movie.title}">
+                        </div>
+                        <div class="movie-details-info">
+                            <h1>${movie.title}</h1>
+                            <div class="movie-meta">
+                                ${movie.release_date ? new Date(movie.release_date).getFullYear() : 'N/A'} • 
+                                ${movie.runtime ? `${movie.runtime} min` : 'N/A'} • 
+                                <i class="fas fa-star" style="color: #ffd700;"></i> ${movie.vote_average ? movie.vote_average.toFixed(1) : 'N/A'}/10
+                            </div>
+                            <div class="movie-genres">
+                                ${movie.genres.map(genre => `<span class="genre-tag">${genre.name}</span>`).join('')}
+                            </div>
+                            <div class="movie-overview">
+                                <strong>Overview:</strong>
+                                <p>${movie.overview || 'No overview available.'}</p>
+                            </div>
+                            <div class="rating-section" id="ratingSection">
+                                <strong>Your Rating:</strong>
+                                <div id="ratingStars"></div>
+                            </div>
+                            <div class="action-buttons">
+                                <button class="btn btn-outline" id="watchlistBtn">
+                                    <i class="fas fa-bookmark"></i> Add to Watchlist
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                
+                // Setup rating stars
+                if (authManager.user) {
+                    setupRatingStars();
+                    document.getElementById('watchlistBtn').addEventListener('click', toggleWatchlist);
+                } else {
+                    document.getElementById('ratingSection').innerHTML = '<p><a href="login.html">Login</a> to rate this movie</p>';
+                    document.getElementById('watchlistBtn').style.display = 'none';
+                }
+                
+            } catch (error) {
+                container.innerHTML = '<p class="error">Failed to load movie details</p>';
+                console.error(error);
+            }
+        }
+        
+        async function loadUserRating() {
+            try {
+                const rating = await api.getMovieRating(movieId);
+                if (rating) {
+                    userRating = rating;
+                    updateRatingStars(rating.rating);
+                }
+            } catch (error) {
+                console.error('Error loading rating:', error);
+            }
+        }
+        
+        function setupRatingStars() {
+            const container = document.getElementById('ratingStars');
+            const stars = MovieComponents.createRatingStars(userRating ? userRating.rating : 0, async (rating) => {
+                try {
+                    if (userRating) {
+                        const updated = await api.updateRating(userRating._id, rating);
+                        userRating = updated;
+                    } else {
+                        const movie = await api.getMovieDetails(movieId);
+                        const newRating = await api.addRating({
+                            movieId: parseInt(movieId),
+                            movieTitle: movie.title,
+                            moviePoster: movie.poster_path,
+                            rating: rating
+                        });
+                        userRating = newRating;
+                    }
+                    updateRatingStars(rating);
+                    authManager.showToast('Rating saved successfully!', 'success');
+                } catch (error) {
+                    authManager.showToast('Failed to save rating', 'error');
+                }
+            });
+            container.appendChild(stars);
+        }
+        
+        function updateRatingStars(rating) {
+            const stars = document.querySelectorAll('.star');
+            stars.forEach((star, index) => {
+                if (index < rating) {
+                    star.classList.add('active');
+                } else {
+                    star.classList.remove('active');
+                }
+            });
+        }
+        
+        async function checkWatchlist() {
+            try {
+                const result = await api.checkWatchlist(movieId);
+                if (result.inWatchlist) {
+                    const watchlist = await api.getWatchlist();
+                    const item = watchlist.find(w => w.movieId == movieId);
+                    if (item) {
+                        watchlistId = item._id;
+                        const btn = document.getElementById('watchlistBtn');
+                        btn.innerHTML = '<i class="fas fa-check"></i> In Watchlist';
+                        btn.classList.add('btn-primary');
+                        btn.classList.remove('btn-outline');
+                    }
+                }
+            } catch (error) {
+                console.error('Error checking watchlist:', error);
+            }
+        }
+        
+        async function toggleWatchlist() {
+            try {
+                if (watchlistId) {
+                    await api.removeFromWatchlist(watchlistId);
+                    watchlistId = null;
+                    const btn = document.getElementById('watchlistBtn');
+                    btn.innerHTML = '<i class="fas fa-bookmark"></i> Add to Watchlist';
+                    btn.classList.remove('btn-primary');
+                    btn.classList.add('btn-outline');
+                    authManager.showToast('Removed from watchlist', 'info');
+                } else {
+                    const movie = await api.getMovieDetails(movieId);
+                    const result = await api.addToWatchlist({
+                        movieId: parseInt(movieId),
+                        movieTitle: movie.title,
+                        moviePoster: movie.poster_path,
+                        movieRating: movie.vote_average
+                    });
+                    watchlistId = result._id;
+                    const btn = document.getElementById('watchlistBtn');
+                    btn.innerHTML = '<i class="fas fa-check"></i> In Watchlist';
+                    btn.classList.remove('btn-outline');
+                    btn.classList.add('btn-primary');
+                    authManager.showToast('Added to watchlist!', 'success');
+                }
+            } catch (error) {
+                authManager.showToast('Failed to update watchlist', 'error');
+            }
+        }
+        
+        async function loadSimilarMovies() {
+            const container = document.getElementById('similarMovies');
+            
+            try {
+                let similar;
+                if (authManager.user) {
+                    similar = await api.getSimilarMovies(movieId);
+                } else {
+                    const movie = await api.getMovieDetails(movieId);
+                    similar = movie.similar ? movie.similar.results.slice(0, 6) : [];
+                }
+                
+                if (similar && similar.length > 0) {
+                    MovieComponents.renderMovies(similar.slice(0, 6), container);
+                } else {
+                    container.innerHTML = '<p>No similar movies found</p>';
+                }
+            } catch (error) {
+                console.error('Error loading similar movies:', error);
+            }
+        }
+    </script>
+</body>
+</html>

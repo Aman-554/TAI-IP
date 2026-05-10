@@ -13,6 +13,9 @@ function Login() {
             const response = await login(formData);
             localStorage.setItem('token', response.data.token);
             localStorage.setItem('userId', response.data.user_id);
+            // After successful login, add this line
+            localStorage.setItem('username', response.data.username);
+            
             navigate('/');
         } catch (err) {
             setError('Invalid credentials');
