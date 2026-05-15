@@ -23,7 +23,16 @@ dist-ssr
 *.sln
 *.sw?
 .env
+.env.*
 node_modules/
 **/.env
 **/.env.*
 **/node_modules
+
+node_modules/
+**/node_modules/
+
+.env
+.env.*
+**/.env
+**/.env.*
